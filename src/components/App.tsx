@@ -29,7 +29,7 @@ const Routes = (cookies: any) => {
 };
 
 function App() {
-  const [cookies, setCookies] = useCookies(["token"]);
+  const [cookies, setCookies] = useCookies(["userId"]);
   const clientApollo = client(cookies);
   return (
     <ApolloProvider client={clientApollo}>

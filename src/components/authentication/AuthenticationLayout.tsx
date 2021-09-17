@@ -76,7 +76,6 @@ function Login(props: Props) {
     const { password, passwordConfirm } = data;
     return !passwordConfirm || password === passwordConfirm;
   };
-
   return (
     <>
       {isLoggedIn ? (
@@ -84,7 +83,7 @@ function Login(props: Props) {
       ) : (
         <Container component="main" maxWidth="xs">
           <div className={styles.loginPage__mainContainer}>
-            'Username: test; password: test - Refresh if login fails (Heroku issue)'
+            'Username: test; password: test'
             <ManualAuth
               submitError={error}
               title={title}

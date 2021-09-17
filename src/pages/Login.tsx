@@ -1,11 +1,13 @@
 import React from "react";
+import { useCookies } from "react-cookie";
+import { useMutation } from "@apollo/react-hooks";
+
 import AuthenticationLayout, {
   AuthenticationData
 } from "../components/authentication/AuthenticationLayout";
-import { useMutation } from "@apollo/react-hooks";
-import { LOGIN } from "../service/apollo/mutations";
-import { useCookies } from "react-cookie";
 import Navigation from "../components/routes/Navigation";
+
+import { LOGIN } from "../service/apollo/mutations";
 import { AuthProvider } from "../service/models/user.model";
 
 function Login() {
