@@ -5,18 +5,22 @@ import {
   Theme,
   TextField,
   Button,
-  Typography
+  Typography,
 } from "@material-ui/core";
 import { useMutation } from "@apollo/react-hooks";
+
 import Post from "../../service/models/posts.model";
-import { MUTATE_POST } from "../../service/apollo/mutations";
-import { GET_POSTS } from "../../service/apollo/queries";
 import store from "../../store/store";
+
+import { MUTATE_POST } from "../../service/apollo/mutations";
+import { CREATE_POST } from "../../service/apollo/mutations";
+import { GET_POSTS } from "../../service/apollo/queries";
 
 type Props = {
   modalTitle: string;
   prefilledPost?: Post;
   onClose: () => void;
+  isNewPost: boolean;
 };
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -27,43 +31,57 @@ const useStyles = makeStyles((theme: Theme) => ({
     backgroundColor: theme.palette.background.paper,
     border: "1px solid #000",
     boxShadow: theme.shadows[5],
-    padding: theme.spacing(2, 4, 3)
+    padding: theme.spacing(2, 4, 3),
   },
   mutateModal__titleInput: {
     display: "block",
     marginTop: 16,
-    marginBottom: 24
+    marginBottom: 24,
   },
   mutateModal__btnSubmit: {
     marginTop: 24,
-    display: "block"
-  }
+    display: "block",
+  },
 }));
 
 function MutatePostModal(props: Props) {
-  const { onClose, prefilledPost, modalTitle } = props;
   const styles = useStyles();
+  const { onClose, prefilledPost, modalTitle, isNewPost } = props;
   const [postDraft, setPostDraft] = useState<Post>(
     new Post(prefilledPost || {})
   );
+  const [createPost] = useMutation(CREATE_POST);
   const [mutatePost] = useMutation(MUTATE_POST);
 
   const onClickSubmit = () => {
     const filters = store.getState().filtersPosts;
-    // mutatePost({
-    //   variables: { request: postDraft },
-    //   refetchQueries: [
-    //     { query: GET_POSTS, variables: { request: { filters } } }
-    //   ]
-    // })
-    Promise.resolve(window.alert('Action coming soon..'))
-      .then(() => {
-        onClose();
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    isNewPost
+      ? createPost({
+          variables: { ...postDraft },
+          refetchQueries: [
+            { query: GET_POSTS, variables: { request: { filters } } },
+          ],
+        })
+          .then(() => {
+            onClose();
+          })
+          .catch((error) => {
+            console.error(error);
+          })
+      : mutatePost({
+          variables: { ...postDraft },
+          refetchQueries: [
+            { query: GET_POSTS, variables: { request: { filters } } },
+          ],
+        })
+          .then(() => {
+            onClose();
+          })
+          .catch((error) => {
+            console.error(error);
+          });
   };
+
   const onChangeTitle = (e: any) => {
     setPostDraft({ ...postDraft, title: e.target.value });
   };

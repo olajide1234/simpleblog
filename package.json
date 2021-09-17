@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "build": "react-scripts build",
-    "start:dev": "react-scripts start",
+    "start:mockserver": "json-graphql-server db.js --p 5000",
+    "start:frontend": "react-scripts start",
+    "start:dev": "npm run start:mockserver & npm run start:frontend",
     "start": "serve -s build",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -85,6 +87,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.18.0",
     "eslint-plugin-react-hooks": "^1.7.0",
+    "json-graphql-server": "^2.2.3",
     "prettier": "^1.19.1",
     "typescript": "^3.7.5"
   }

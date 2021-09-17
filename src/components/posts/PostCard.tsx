@@ -26,11 +26,12 @@ const EDIT_POST_MODAL_TITLE = "Edit a Post";
 
 const useStyles = makeStyles(() => ({
   postCard__title: {
-    fontWeight: "bold"
+    fontWeight: "bold",
   },
   postCard__container: {
-    width: "500px"
-  }
+    width: "500px",
+    marginTop: "5%",
+  },
 }));
 
 function PostCard(props: Props) {
@@ -43,17 +44,15 @@ function PostCard(props: Props) {
 
   const onClickClearBtn = () => {
     const filters = store.getState().filtersPosts;
-    // deletePost({
-    //   variables: { ids: [String(postId)] },
-    //   refetchQueries: [
-    //     {
-    //       query: GET_POSTS,
-    //       variables: { request: { filters } }
-    //     }
-    //   ]
-    // })
-    Promise.resolve(window.alert('Action coming soon...'))
-      .then(() => {})
+    deletePost({
+      variables: { id: String(postId) },
+      refetchQueries: [
+        {
+          query: GET_POSTS,
+          variables: { request: { filters } }
+        }
+      ]
+    }).then(() => {})
       .catch(() => {});
   };
 
@@ -91,6 +90,7 @@ function PostCard(props: Props) {
           modalTitle={EDIT_POST_MODAL_TITLE}
           prefilledPost={post}
           onClose={() => setDisplayModal(false)}
+          isNewPost={false}
         />
       )}
     </Card>
