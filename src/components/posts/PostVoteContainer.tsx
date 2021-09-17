@@ -3,11 +3,13 @@ import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import { Button } from "@material-ui/core";
 import { useMutation } from "@apollo/react-hooks";
-import { MUTATE_VOTE } from "../../service/apollo/mutations";
 import { useCookies } from "react-cookie";
+
+import { MUTATE_VOTE } from "../../service/apollo/mutations";
 import { GET_POSTS } from "../../service/apollo/queries";
-import store from "../../store/store";
 import Post from "../../service/models/posts.model";
+
+import store from "../../store/store";
 
 type Props = {
   post: Post;
@@ -15,17 +17,22 @@ type Props = {
 
 enum PostVoteType {
   UP = "UP",
-  DOWN = "DOWN"
+  DOWN = "DOWN",
 }
 
-function findPreviousVote(votes: any[], userId: number) {
+enum ColorType {
+  PRIMARY = "primary",
+  INHERIT = "inherit",
+}
+
+function findPreviousVote(votes: any[], userId: number): PostVoteType {
   return votes.find((vote) => Number(vote.user.id) === Number(userId))?.user
     ?.vote;
 }
 
 function PostVoteContainer(props: Props) {
   const {
-    post: { id: postId, votes }
+    post: { id: postId, votes },
   } = props;
   const [mutateVote] = useMutation(MUTATE_VOTE);
   const [cookies] = useCookies();
@@ -33,11 +40,11 @@ function PostVoteContainer(props: Props) {
   const filters = store.getState().filtersPosts;
   const currentVote = findPreviousVote(votes, authorId);
 
-  const thumbColor = (targetVote: PostVoteType) => {
-    return currentVote === targetVote ? "primary" : "inherit";
+  const thumbColor = (targetVote: PostVoteType): ColorType => {
+    return currentVote === targetVote ? ColorType.PRIMARY : ColorType.INHERIT;
   };
 
-  const onClickIcon = (vote: PostVoteType) => {
+  const onClickIcon = (vote: PostVoteType): void => {
     if (vote === currentVote) {
       executeDeleteVote();
     } else {
@@ -45,9 +52,12 @@ function PostVoteContainer(props: Props) {
     }
   };
 
-  const executeAddVote = (vote: PostVoteType) => {
+  const executeAddVote = (vote: PostVoteType): void => {
     mutateVote({
-      variables: { id: postId, votes: [...votes, { user: { id: authorId, vote: vote } }] },
+      variables: {
+        id: postId,
+        votes: [...votes, { user: { id: authorId, vote: vote } }],
+      },
       refetchQueries: [
         {
           query: GET_POSTS,
@@ -61,10 +71,10 @@ function PostVoteContainer(props: Props) {
       });
   };
 
-  const executeDeleteVote = () => {
+  const executeDeleteVote = (): void => {
     const updatedVotes = votes.filter((vote) => vote.user.id !== authorId);
     mutateVote({
-      variables: { id: postId, votes: [...updatedVotes]},
+      variables: { id: postId, votes: [...updatedVotes] },
       refetchQueries: [
         {
           query: GET_POSTS,
@@ -77,13 +87,16 @@ function PostVoteContainer(props: Props) {
         console.error(error);
       });
   };
+
+  const handleIconDownClick = (): void => onClickIcon(PostVoteType.DOWN);
+  const handleIconUpClick = (): void => onClickIcon(PostVoteType.UP);
 
   return (
     <>
-      <Button onClick={() => onClickIcon(PostVoteType.UP)}>
+      <Button onClick={handleIconUpClick}>
         <ThumbUpIcon color={thumbColor(PostVoteType.UP)} />
       </Button>
-      <Button onClick={() => onClickIcon(PostVoteType.DOWN)}>
+      <Button onClick={handleIconDownClick}>
         <ThumbDownIcon color={thumbColor(PostVoteType.DOWN)} />
       </Button>
     </>

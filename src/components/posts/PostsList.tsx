@@ -2,7 +2,7 @@ import React from "react";
 import Post from "../../service/models/posts.model";
 import PostCard from "./PostCard";
 
-type Props = {
+interface Props  {
   posts: Array<Post>;
 };
 
