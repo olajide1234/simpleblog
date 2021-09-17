@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, ChangeEvent } from "react";
 import {
   Modal,
   makeStyles,
@@ -15,13 +15,6 @@ import store from "../../store/store";
 import { MUTATE_POST } from "../../service/apollo/mutations";
 import { CREATE_POST } from "../../service/apollo/mutations";
 import { GET_POSTS } from "../../service/apollo/queries";
-
-type Props = {
-  modalTitle: string;
-  prefilledPost?: Post;
-  onClose: () => void;
-  isNewPost: boolean;
-};
 
 const useStyles = makeStyles((theme: Theme) => ({
   mutateModal__container: {
@@ -44,6 +37,13 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
+interface Props {
+  modalTitle: string;
+  prefilledPost?: Post;
+  onClose: () => void;
+  isNewPost: boolean;
+}
+
 function MutatePostModal(props: Props) {
   const styles = useStyles();
   const { onClose, prefilledPost, modalTitle, isNewPost } = props;
@@ -53,7 +53,7 @@ function MutatePostModal(props: Props) {
   const [createPost] = useMutation(CREATE_POST);
   const [mutatePost] = useMutation(MUTATE_POST);
 
-  const onClickSubmit = () => {
+  const onClickSubmit = (): void => {
     const filters = store.getState().filtersPosts;
     isNewPost
       ? createPost({
@@ -82,11 +82,11 @@ function MutatePostModal(props: Props) {
           });
   };
 
-  const onChangeTitle = (e: any) => {
-    setPostDraft({ ...postDraft, title: e.target.value });
-  };
-  const onChangeDescription = (e: any) => {
-    setPostDraft({ ...postDraft, description: e.target.value });
+  const onChangeForm = (e: ChangeEvent<HTMLInputElement>): void => {
+    setPostDraft({
+      ...postDraft,
+      [e.currentTarget.id]: e.currentTarget.value,
+    });
   };
 
   return (
@@ -94,8 +94,8 @@ function MutatePostModal(props: Props) {
       disableEnforceFocus
       disableAutoFocus
       open
-      aria-labelledby="server-modal-title"
-      aria-describedby="server-modal-description"
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
       onClose={onClose}
     >
       <div className={styles.mutateModal__container}>
@@ -104,21 +104,21 @@ function MutatePostModal(props: Props) {
         <div className={styles.mutateModal__titleInput}>
           <TextField
             required
-            id="title-input"
-            label="Required"
-            placeholder="Title"
+            id="title"
+            label="Title"
+            placeholder="Post title"
             value={postDraft.title}
-            onChange={onChangeTitle}
+            onChange={onChangeForm}
           />
         </div>
         <TextField
           multiline
           required
-          id="description-input"
-          label="Required"
-          placeholder="Description"
+          id="description"
+          label="Description"
+          placeholder="Post content"
           value={postDraft.description}
-          onChange={onChangeDescription}
+          onChange={onChangeForm}
         />
         <div className={styles.mutateModal__btnSubmit}>
           <Button

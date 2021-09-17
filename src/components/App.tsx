@@ -1,21 +1,24 @@
 import React from "react";
 import { ApolloProvider } from "@apollo/react-hooks";
-import { client } from "../service/apollo/client";
 import { BrowserRouter as Router } from "react-router-dom";
-import { Route, Switch } from "react-router";
-import routes from "../routes/routes";
-import ProtectedRoute from "./routes/ProtectedRoute";
-import store from "../store/store";
 import { Provider } from "react-redux";
 import { useCookies } from "react-cookie";
+import { Route, Switch } from "react-router";
+
+import { client } from "../service/apollo/client";
+import routes from "../routes/routes";
+import ProtectedRoute from "./routes/ProtectedRoute";
+
+import store from "../store/store";
+
 
 function isUserLoggedIn(cookies: any) {
   const userId: number = +cookies["userId"];
   return !!userId;
 }
 
-const Routes = (cookies: any) => {
-  return routes.map(route =>
+const Routes = (cookies: { [name: string]: number }) => {
+  return routes.map((route) =>
     route.protected ? (
       <ProtectedRoute
         isUserLoggedIn={isUserLoggedIn(cookies)}

@@ -3,7 +3,12 @@ class Post {
   title: string;
   description: string;
   authorId: string;
-  votes: any[]; // TODO (fix type)
+  votes: {
+    user: {
+      id: string;
+      vote: string;
+    };
+  }[];
 
   constructor(props: any) {
     this.id = props.id;
