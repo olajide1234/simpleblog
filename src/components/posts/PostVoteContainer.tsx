@@ -3,7 +3,7 @@ import ThumbUpIcon from "@material-ui/icons/ThumbUp";
 import ThumbDownIcon from "@material-ui/icons/ThumbDown";
 import { Button } from "@material-ui/core";
 import { useMutation } from "@apollo/react-hooks";
-import { MUTATE_VOTE, DELETE_VOTE } from "../../service/apollo/mutations";
+import { MUTATE_VOTE } from "../../service/apollo/mutations";
 import { useCookies } from "react-cookie";
 import { GET_POSTS } from "../../service/apollo/queries";
 import store from "../../store/store";
@@ -18,15 +18,15 @@ enum PostVoteType {
   DOWN = "DOWN"
 }
 
-function findPreviousVote(votes: any[], userId: string) {
-  return votes.find(vote => vote.user.id === userId)?.vote;
+function findPreviousVote(votes: any[], userId: number) {
+  return votes.find((vote) => Number(vote.user.id) === Number(userId))?.user
+    ?.vote;
 }
 
 function PostVoteContainer(props: Props) {
   const {
     post: { id: postId, votes }
   } = props;
-  const [deleteVote] = useMutation(DELETE_VOTE);
   const [mutateVote] = useMutation(MUTATE_VOTE);
   const [cookies] = useCookies();
   const authorId = cookies["userId"];
@@ -41,40 +41,39 @@ function PostVoteContainer(props: Props) {
     if (vote === currentVote) {
       executeDeleteVote();
     } else {
-      executeMutateVote(vote);
+      executeAddVote(vote);
     }
   };
 
-  const executeMutateVote = (vote: PostVoteType) => {
-    // mutateVote({
-    //   variables: { request: { postId, authorId, vote } },
-    //   refetchQueries: [
-    //     {
-    //       query: GET_POSTS,
-    //       variables: { request: { filters } }
-    //     }
-    //   ]
-    // })
-    Promise.resolve(window.alert('Action coming soon ...'))
+  const executeAddVote = (vote: PostVoteType) => {
+    mutateVote({
+      variables: { id: postId, votes: [...votes, { user: { id: authorId, vote: vote } }] },
+      refetchQueries: [
+        {
+          query: GET_POSTS,
+          variables: { request: { filters } },
+        },
+      ],
+    })
       .then(() => {})
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   };
 
   const executeDeleteVote = () => {
-    // deleteVote({
-    //   variables: { request: { postId, authorId } },
-    //   refetchQueries: [
-    //     {
-    //       query: GET_POSTS,
-    //       variables: { request: { filters } }
-    //     }
-    //   ]
-    // })
-    Promise.resolve(window.alert('Action coming soon ...'))
+    const updatedVotes = votes.filter((vote) => vote.user.id !== authorId);
+    mutateVote({
+      variables: { id: postId, votes: [...updatedVotes]},
+      refetchQueries: [
+        {
+          query: GET_POSTS,
+          variables: { request: { filters } },
+        },
+      ],
+    })
       .then(() => {})
-      .catch(error => {
+      .catch((error) => {
         console.error(error);
       });
   };

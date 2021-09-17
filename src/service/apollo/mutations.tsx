@@ -1,60 +1,59 @@
 import gql from "graphql-tag";
 import { PostFragment } from "./fragments";
 
+export const CREATE_POST = gql`
+  mutation CreatePost(
+    $title: String!
+    $description: String!
+    $authorId: String!
+    $votes: JSON!
+  ) {
+    createPost(
+      title: $title
+      description: $description
+      authorId: $authorId
+      votes: $votes
+    ) {
+      ...PostItem
+    }
+  }
+  ${PostFragment.post}
+`;
+
 export const MUTATE_POST = gql`
-  mutation MutatePost($request: MutatePostRequest!) {
-    mutatePost(request: $request) {
-      error
-      success
-      post {
-        ...PostItem
-      }
+  mutation MutatePost(
+    $id: ID!
+    $title: String!
+    $description: String!
+    $authorId: String!
+    $votes: JSON!
+  ) {
+    updatePost(
+      id: $id
+      title: $title
+      description: $description
+      authorId: $authorId
+      votes: $votes
+    ) {
+      ...PostItem
     }
   }
   ${PostFragment.post}
 `;
 
 export const DELETE_POSTS_BY_IDS = gql`
-  mutation DeletePostsByIds($ids: [ID]!) {
-    deletePostsByIds(ids: $ids) {
-      error
-      success
-      posts {
-        ...PostItem
-      }
+  mutation DeletePostsByIds($id: ID!) {
+    removePost(id: $id) {
+      ...PostItem
     }
   }
   ${PostFragment.post}
 `;
 
 export const MUTATE_VOTE = gql`
-  mutation MutateVote($request: MutateVoteRequest!) {
-    mutateVote(request: $request) {
-      vote {
-        vote
-        post {
-          id
-        }
-        user {
-          id
-        }
-      }
-    }
-  }
-`;
-
-export const DELETE_VOTE = gql`
-  mutation DeleteVote($request: DeleteVoteRequest!) {
-    deleteVote(request: $request) {
-      vote {
-        vote
-        post {
-          id
-        }
-        user {
-          id
-        }
-      }
+  mutation MutateVote($id: ID! $votes: JSON!) {
+    updatePost(id: $id votes: $votes) {
+      votes
     }
   }
 `;
@@ -76,13 +75,13 @@ export const SIGNUP = gql`
 export const LOGIN = gql`
   mutation Login($request: LoginRequest!) {
     login(request: $request) {
-      error 
+      error
       user {
-        id 
-        email 
-        authProvider 
+        id
+        email
+        authProvider
       }
-      token 
+      token
     }
   }
 `;

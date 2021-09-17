@@ -74,6 +74,7 @@ function PostsLayout(props: Props) {
           prefilledPost={new Post({ authorId: userId })}
           modalTitle={CREATE_POST_MODAL_TITLE}
           onClose={() => setDisplayModal(false)}
+          isNewPost={true}
         />
       )}
     </>

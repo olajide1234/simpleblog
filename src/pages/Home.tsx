@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import PostsLayout from "../components/posts/PostsLayout";
-// import { useQuery } from "@apollo/react-hooks";
-// import { GET_POSTS } from "../service/apollo/queries";
-import { GET_POSTS } from '../tests/mocks/gqlMock'
-import Navigation from "../components/routes/Navigation";
+import { useQuery } from "@apollo/react-hooks";
 import { useCookies } from "react-cookie";
+
+import PostsLayout from "../components/posts/PostsLayout";
+import Navigation from "../components/routes/Navigation";
 import store from "../store/store";
+
+import { GET_POSTS } from "../service/apollo/queries";
 import { updateFiltersPosts } from "../store/actions";
 
 
@@ -18,19 +19,17 @@ const useStyles = makeStyles(() => ({
 }));
 
 function Home() {
-  const [filters, setFilters] = useState<any>(null);
   const styles = useStyles();
   const [cookies] = useCookies();
-  const { data } = GET_POSTS;
-  const posts = data?.getPostsWithFilters?.posts || [];
+  const { data } = useQuery(GET_POSTS);
+  const posts = data?.allPosts || [];
   const userId = cookies["userId"];
 
-  const setUserFilter = (withFilters: boolean) => {
+  const setUserFilter = (filterArg: boolean) => {
     let filters = null;
-    if (withFilters) {
+    if (filterArg) {
       filters = { authorId: userId };
     }
-    setFilters(filters);
     store.dispatch(updateFiltersPosts(filters));
   };
 
